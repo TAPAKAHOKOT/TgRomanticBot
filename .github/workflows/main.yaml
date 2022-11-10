@@ -14,7 +14,7 @@ jobs:
       uses: appleboy/ssh-action@master
       with:
         host: 91.227.18.79
-        username: root
+        username: tg_romantic_bot
         key: ${{ secrets.SECRET_KEY }}
         port: 22
         script: |
