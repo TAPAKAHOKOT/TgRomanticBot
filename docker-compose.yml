@@ -1,0 +1,49 @@
+version: '3.8'
+
+services:
+  romantic_bot_db:
+    container_name: romantic_bot_db
+    restart: always
+    image: postgres:12.0-alpine
+    ports:
+      - ${DB_PORT}:${DB_PORT}
+    volumes:
+      - postgres_data:/var/lib/postgresql/data/
+    environment:
+      - POSTGRES_USER=${DB_USER}
+      - POSTGRES_PASSWORD=${DB_PASS}
+      - POSTGRES_DB=${DB_NAME}
+    command: -p ${DB_PORT}
+  romantic_bot_migration:
+    container_name: romantic_bot_migration
+    links:
+      - romantic_bot_db
+    depends_on:
+      - romantic_bot_db
+    build: .
+    command: alembic upgrade head
+  romantic_bot_cache:
+    container_name: romantic_bot_cache
+    depends_on:
+      - romantic_bot_migration
+    image: redis:latest
+    restart: always
+    ports:
+      - ${REDIS_PORT}:${REDIS_PORT}
+    command: redis-server --save 20 1 --requirepass ${REDIS_PASS}
+    volumes:
+      - cache:/data
+  romantic_bot_bot:
+    container_name: romantic_bot_bot
+    restart: always
+    depends_on:
+      - romantic_bot_cache
+    build: ./
+    command: python main.py
+    volumes:
+      - ./:/usr/src/app/
+    env_file:
+      - ./.env
+volumes:
+  postgres_data:
+  cache:

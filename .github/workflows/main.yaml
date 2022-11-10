@@ -1,0 +1,26 @@
+name: Deploy
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  deploy:
+    name: Deploy
+    runs-on: ubuntu-latest
+    steps:
+    - name: Deploying
+      uses: appleboy/ssh-action@master
+      with:
+        host: 11.111.11.11
+        username: root
+        key: ${{ secrets.SECRET_KEY }}
+        port: 22
+        script: |
+          git -C "/home/****/****" pull
+          cd /home/****/****
+          docker-compose down
+          docker-compose rm -fsv
+          docker-compose up -d --build
+          docker exec binance_bot alembic upgrade head
