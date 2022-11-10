@@ -18,9 +18,8 @@ jobs:
         key: ${{ secrets.SECRET_KEY }}
         port: 22
         script: |
-          git -C "/home/****/****" pull
-          cd /home/****/****
+          git -C "/home/tg_romantic_bot/TgRomanticBot" pull
+          cd /home/tg_romantic_bot/TgRomanticBot
           docker-compose down
           docker-compose rm -fsv
           docker-compose up -d --build
-          docker exec binance_bot alembic upgrade head
