@@ -95,6 +95,11 @@ class MessagesService:
             }
 
     @staticmethod
+    async def is_message_exists(message_id: int):
+        with Session(engine) as session, session.begin():
+            return bool(Messages.find_by_id(session, message_id))
+
+    @staticmethod
     async def delete_message(message_id: int):
         with Session(engine) as session, session.begin():
             Messages.delete(session, message_id)

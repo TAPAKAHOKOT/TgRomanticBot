@@ -9,6 +9,7 @@ from src.Callbacks import AnswerCallback
 from src.Filters.RolesFilter import IsRootFilter
 from src.Services import MessagesService
 from src.States import AnswerForm
+from loguru import logger
 
 
 @settings.dp.message_handler(IsRootFilter(), commands=['get_all_messages'])
@@ -28,8 +29,9 @@ async def delete_message(message: types.Message):
             for message_id in range(int(message_id_str_split[0]), int(message_id_str_split[1]) + 1):
                 is_iterated = True
                 try:
-                    await MessagesService.delete_message(int(message_id))
-                    await message.answer(f'Сообщение {message_id} удалено')
+                    if await MessagesService.is_message_exists(int(message_id)):
+                        await MessagesService.delete_message(int(message_id))
+                        await message.answer(f'Сообщение {message_id} удалено')
                 except Exception:
                     continue
 
