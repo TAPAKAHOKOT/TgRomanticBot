@@ -10,7 +10,11 @@ from src.Services import MessagesService
 
 @settings.dp.message_handler(Text(equals=translations.get_in_all_languages('keyboards.buttons.get-message')))
 async def write_to_dev_message(message: types.Message, user: User):
-    random_message = await MessagesService.get_random_message(user.id)
+    random_message = await MessagesService.get_random_message(
+        user.id,
+        settings.limits['hours'],
+        settings.limits['messages']
+    )
 
     if random_message is None:
         await message.answer('Нет доступных сообщений')
@@ -39,5 +43,5 @@ async def write_to_dev_message(message: types.Message, user: User):
                     chat_id=chat_id,
                     message_id=random_message['message_id']
                 )
-    except Exception:
+    except Exception as e:
         pass

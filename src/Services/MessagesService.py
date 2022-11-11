@@ -7,8 +7,7 @@ from Tables import (
     Messages,
     UsersGainedMessages
 )
-import datetime as dt
-from loguru import logger
+from .DateService import DateService
 
 
 class MessagesService:
@@ -42,19 +41,16 @@ class MessagesService:
             )
 
     @staticmethod
-    async def get_random_message(user_id: int) -> dict | str | None:
+    async def get_random_message(user_id: int, hours_limit: int, messages_limit: int) -> dict | str | None:
         with Session(engine) as session, session.begin():
-            last_except_message = UsersGainedMessages.get_last_by_user_id(session, user_id)
+            last_except_messages = UsersGainedMessages.get_last_by_user_id(session, user_id)
 
-            td = dt.datetime.today() - last_except_message.created_at
-            total_seconds_left = int(86400 - td.total_seconds())
+            if len(last_except_messages) >= messages_limit:
+                except_messages_to_count = last_except_messages[messages_limit-1]
+                total_seconds_left = DateService.get_seconds_left(except_messages_to_count.created_at, hours_limit)
 
-            h = total_seconds_left//3600
-            m = (total_seconds_left - h*3600)//60
-            s = total_seconds_left - h*3600 - m*60
-
-            if total_seconds_left > 0:
-                return f'{h}:{m}:{s}'
+                if total_seconds_left > 0:
+                    return DateService.seconds_to_str(total_seconds_left)
 
             except_messages = UsersGainedMessages.find_by_user_id(session, user_id)
             messages = Messages.get_all_except(
@@ -66,15 +62,6 @@ class MessagesService:
                     )
                 )
             )
-            logger.debug(list(
-                    map(
-                        lambda m: m.message_id,
-                        except_messages
-                    )
-                ))
-            logger.debug(except_messages)
-            logger.debug(messages)
-            logger.debug(user_id)
 
             if not messages:
                 return None
@@ -87,8 +74,6 @@ class MessagesService:
                     )
                 )
             )
-
-            logger.debug(random_message)
 
             gained_message = UsersGainedMessages(
                 user_id=user_id,

@@ -27,4 +27,7 @@ class Settings:
         self.dp = Dispatcher(self.bot, storage=MemoryStorage())
         logger.info('Created Dispatcher')
 
-        self.messages = []
+        self.limits = {
+            'hours': int(getenv('LIMITS_HOURS')),
+            'messages': int(getenv('LIMITS_MESSAGES'))
+        }

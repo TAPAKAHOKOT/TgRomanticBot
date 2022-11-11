@@ -1,11 +1,14 @@
 from aiogram import types
-from aiogram.dispatcher.filters import Text
+from aiogram.dispatcher import FSMContext, Dispatcher
+from aiogram.types import ParseMode
+from aiogram.utils.exceptions import BadRequest
 
-from Configs import translations
 from Settings import settings
 from Tables import User
+from src.Callbacks import AnswerCallback
 from src.Filters.RolesFilter import IsRootFilter
 from src.Services import MessagesService
+from src.States import AnswerForm
 
 
 @settings.dp.message_handler(IsRootFilter(), commands=['get_all_messages'])
@@ -19,10 +22,20 @@ async def delete_message(message: types.Message):
     message_id_str = message.text.replace('/delete ', '')
 
     is_iterated = False
+    if '-' in message_id_str:
+        message_id_str_split = message_id_str.replace(' ', '').split('-')
+        if len(message_id_str_split) == 2:
+            for message_id in range(int(message_id_str_split[0]), int(message_id_str_split[1]) + 1):
+                is_iterated = True
+                try:
+                    await MessagesService.delete_message(int(message_id))
+                    await message.answer(f'Сообщение {message_id} удалено')
+                except Exception:
+                    continue
+
     for message_id in message_id_str.replace(' ', '').split(','):
         if message_id.isdigit():
             is_iterated = True
-
             try:
                 await MessagesService.delete_message(int(message_id))
                 await message.answer(f'Сообщение {message_id} удалено')
@@ -37,28 +50,98 @@ async def get_message(message: types.Message):
     message_id_str = message.text.replace('/get ', '')
 
     is_iterated = False
+    if '-' in message_id_str:
+        message_id_str_split = message_id_str.replace(' ', '').split('-')
+        if len(message_id_str_split) == 2:
+            for message_id in range(int(message_id_str_split[0]), int(message_id_str_split[1]) + 1):
+                is_iterated = True
+                try:
+                    message_data = await MessagesService.get_message(int(message_id))
+                except Exception:
+                    continue
+
+                await message.answer(f'Сообщение {message_id}:')
+                try:
+                    await settings.bot.copy_message(
+                        from_chat_id=message_data['chat_id'],
+                        chat_id=message.chat.id,
+                        message_id=message_data['message_id']
+                    )
+                except BadRequest:
+                    await message.answer('удалено')
+
     for message_id in message_id_str.replace(' ', '').split(','):
         if message_id.isdigit():
             is_iterated = True
-
             try:
                 message_data = await MessagesService.get_message(int(message_id))
             except Exception:
                 continue
 
             await message.answer(f'Сообщение {message_id}:')
-            await settings.bot.copy_message(
-                from_chat_id=message_data['chat_id'],
-                chat_id=message.chat.id,
-                message_id=message_data['message_id']
-            )
+            try:
+                await settings.bot.copy_message(
+                    from_chat_id=message_data['chat_id'],
+                    chat_id=message.chat.id,
+                    message_id=message_data['message_id']
+                )
+            except BadRequest:
+                await message.answer('удалено')
 
     if not is_iterated:
         await message.answer('Форм записи команды /get:\n/get <число>, <число>, ...')
 
 
+@settings.dp.callback_query_handler(
+    AnswerCallback.get_answer_inline_data().filter()
+)
+async def write_to_dev_message(call: types.CallbackQuery):
+    _, username, chat_id, reply_message_id = call.data.split(':')
+
+    state = AnswerForm.answer
+    await state.set()
+
+    state = Dispatcher.get_current().current_state()
+    await state.update_data({
+        'username': username,
+        'chat_id': chat_id,
+        'reply_message_id': reply_message_id
+    })
+
+    await call.message.answer(
+        f'Следующее твое сообщение будет скопировано пользователю [ <a href=\'https://t.me/{username}\'>{username}</a> ] [<a href=\'https://web.telegram.org/k/#{chat_id}\'>{chat_id}</a>]',
+        reply_markup=AnswerCallback.get_cancel_inline(),
+        parse_mode=ParseMode.HTML,
+    )
+
+
 @settings.dp.message_handler(
-    Text(equals=translations.get_in_all_languages('keyboards.buttons.get-message')),
+    IsRootFilter(),
+    content_types=['any'],
+    state=AnswerForm.answer
+)
+async def write_to_dev_message(message: types.Message, state: FSMContext):
+    state_data = await state.get_data()
+    await state.finish()
+
+    await settings.bot.copy_message(
+        from_chat_id=message.chat.id,
+        chat_id=state_data.get('chat_id'),
+        message_id=message.message_id,
+        reply_to_message_id=state_data.get('reply_message_id')
+    )
+    await message.answer('Сообщение скопировано', reply=True)
+
+
+@settings.dp.callback_query_handler(
+    AnswerCallback.get_cancel_inline_data().filter()
+)
+async def write_to_dev_message(call: types.CallbackQuery, state: FSMContext):
+    await state.finish()
+    await call.message.delete()
+
+
+@settings.dp.message_handler(
     IsRootFilter(),
     content_types=['any']
 )

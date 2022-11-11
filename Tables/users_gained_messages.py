@@ -39,10 +39,10 @@ class UsersGainedMessages(Base, BaseModel):
         ).all()
 
     @staticmethod
-    def get_last_by_user_id(session: Session, user_id: int) -> 'UsersGainedMessages':
+    def get_last_by_user_id(session: Session, user_id: int) -> list:
         return session.query(UsersGainedMessages).where(
             UsersGainedMessages.user_id == user_id
-        ).order_by(desc(UsersGainedMessages.created_at)).first()
+        ).order_by(desc(UsersGainedMessages.created_at)).all()
 
 
 user_gained_messages_table = UsersGainedMessages.__table__
