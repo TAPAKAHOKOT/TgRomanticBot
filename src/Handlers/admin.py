@@ -1,5 +1,7 @@
 from aiogram import types
+from aiogram.dispatcher.filters import Text
 
+from Configs import translations
 from Settings import settings
 from Tables import User
 from src.Filters.RolesFilter import IsRootFilter
@@ -46,16 +48,20 @@ async def get_message(message: types.Message):
 
             await message.answer(f'Сообщение {message_id}:')
             await settings.bot.copy_message(
-                    from_chat_id=message_data['chat_id'],
-                    chat_id=message.chat.id,
-                    message_id=message_data['message_id']
-                )
+                from_chat_id=message_data['chat_id'],
+                chat_id=message.chat.id,
+                message_id=message_data['message_id']
+            )
 
     if not is_iterated:
         await message.answer('Форм записи команды /get:\n/get <число>, <число>, ...')
 
 
-@settings.dp.message_handler(IsRootFilter(), content_types=['any'])
+@settings.dp.message_handler(
+    Text(equals=translations.get_in_all_languages('keyboards.buttons.get-message')),
+    IsRootFilter(),
+    content_types=['any']
+)
 async def save_any_message(message: types.Message, user: User):
     saved_message_id = await MessagesService.add_message(
         user.id,
