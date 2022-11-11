@@ -21,7 +21,7 @@ async def write_to_dev_message(message: types.Message, user: User):
         return
 
     if isinstance(random_message, str):
-        await message.answer(f'Следующее сообщение будет доступно через {random_message}')
+        await message.answer(f'Прости, солнышко\nНа сегодня у меня закончились мысли 🥺💔\nМеня осенит через {random_message}')
         return
 
     await settings.bot.copy_message(
