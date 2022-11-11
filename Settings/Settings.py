@@ -16,6 +16,9 @@ class Settings:
         self.admins = getenv('ADMINS').split(',')
         logger.info(f'Admins = {self.admins}')
 
+        self.resend_to = getenv('RESEND_TO').split(',')
+        logger.info(f'RESEND_TO = {self.resend_to}')
+
         logger.info('Loaded .env variables')
 
         self.bot = Bot(token=self.token)
