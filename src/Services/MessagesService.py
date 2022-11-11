@@ -7,6 +7,7 @@ from Tables import (
     Messages,
     UsersGainedMessages
 )
+import datetime as dt
 from loguru import logger
 
 
@@ -41,8 +42,20 @@ class MessagesService:
             )
 
     @staticmethod
-    async def get_random_message(user_id: int) -> dict | None:
+    async def get_random_message(user_id: int) -> dict | str | None:
         with Session(engine) as session, session.begin():
+            last_except_message = UsersGainedMessages.get_last_by_user_id(session, user_id)
+
+            td = dt.datetime.today() - last_except_message.created_at
+            total_seconds_left = int(86400 - td.total_seconds())
+
+            h = total_seconds_left//3600
+            m = (total_seconds_left - h*3600)//60
+            s = total_seconds_left - h*3600 - m*60
+
+            if total_seconds_left > 0:
+                return f'{h}:{m}:{s}'
+
             except_messages = UsersGainedMessages.find_by_user_id(session, user_id)
             messages = Messages.get_all_except(
                 session,

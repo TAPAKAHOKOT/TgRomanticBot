@@ -17,9 +17,14 @@ async def command_start(message: types.Message):
     )
 
 
-@settings.dp.message_handler(commands=["help"])
+@settings.dp.message_handler(IsRootFilter(), commands=["help"])
 async def command_help(message: types.Message):
     await message.answer(translations.get('commands.answers.help'))
+
+
+@settings.dp.message_handler(commands=["help"])
+async def command_help(message: types.Message):
+    await message.answer(translations.get('commands.answers.help-all'))
 
 
 @settings.dp.message_handler(IsRootFilter(), commands=["role"])

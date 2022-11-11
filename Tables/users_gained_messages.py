@@ -6,7 +6,8 @@ from sqlalchemy import (
     Integer,
     BigInteger,
     DateTime,
-    text
+    text,
+    desc
 )
 from sqlalchemy.orm import (
     Session
@@ -36,6 +37,12 @@ class UsersGainedMessages(Base, BaseModel):
         return session.query(UsersGainedMessages).where(
             UsersGainedMessages.user_id == user_id
         ).all()
+
+    @staticmethod
+    def get_last_by_user_id(session: Session, user_id: int) -> 'UsersGainedMessages':
+        return session.query(UsersGainedMessages).where(
+            UsersGainedMessages.user_id == user_id
+        ).order_by(desc(UsersGainedMessages.created_at)).first()
 
 
 user_gained_messages_table = UsersGainedMessages.__table__
