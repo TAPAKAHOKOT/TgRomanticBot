@@ -22,6 +22,11 @@ class BotSettings:
 
     def set(self, name, value):
         with Session(engine) as session, session.begin():
+            new_bot_settings = BotSettingsDB.get_by_name(session, name)
+            if new_bot_settings:
+                self.update(name, value)
+                return
+
             new_bot_settings = BotSettingsDB(
                 name=name,
                 value=value
