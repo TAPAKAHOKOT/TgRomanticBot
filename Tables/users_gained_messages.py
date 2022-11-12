@@ -44,5 +44,13 @@ class UsersGainedMessages(Base, BaseModel):
             UsersGainedMessages.user_id == user_id
         ).order_by(desc(UsersGainedMessages.created_at)).all()
 
+    @staticmethod
+    def get_all_in(session: Session, user_id: int, id_list: list) -> list:
+        return session.query(UsersGainedMessages).where(
+            UsersGainedMessages.user_id == user_id
+        ).filter(
+            UsersGainedMessages.id.in_(id_list)
+        ).all()
+
 
 user_gained_messages_table = UsersGainedMessages.__table__

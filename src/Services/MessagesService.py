@@ -5,7 +5,8 @@ from sqlalchemy.orm import Session
 from Database import engine
 from Tables import (
     Messages,
-    UsersGainedMessages
+    UsersGainedMessages,
+    User
 )
 from .DateService import DateService
 
@@ -103,3 +104,12 @@ class MessagesService:
     async def delete_message(message_id: int):
         with Session(engine) as session, session.begin():
             Messages.delete(session, message_id)
+
+    @staticmethod
+    async def get_left_messages_count(chat_id: int):
+        with Session(engine) as session, session.begin():
+            user = User.find_by_chat_id(session, chat_id)
+            all_messages = list(map(lambda m: m.id, Messages.get_all(session)))
+            gained_messages = UsersGainedMessages.get_all_in(session, user.id, all_messages)
+
+            return user.username, len(all_messages) - len(gained_messages)

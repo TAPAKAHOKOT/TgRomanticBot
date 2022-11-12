@@ -9,7 +9,6 @@ from src.Callbacks import AnswerCallback
 from src.Filters.RolesFilter import IsRootFilter
 from src.Services import MessagesService
 from src.States import AnswerForm
-from loguru import logger
 
 
 @settings.dp.message_handler(IsRootFilter(), commands=['get_all_messages'])
@@ -91,7 +90,25 @@ async def get_message(message: types.Message):
                 await message.answer('удалено')
 
     if not is_iterated:
-        await message.answer('Форм записи команды /get:\n/get <число>, <число>, ...')
+        await message.answer('Форма записи команды /get:\n/get <число>, <число>, ...')
+
+
+@settings.dp.message_handler(IsRootFilter(), commands=['left_messages_count'])
+async def func(message: types.Message):
+    chat_id = message.text.replace('/left_messages_count', '').replace(' ', '')
+
+    if not chat_id.isdigit():
+        await message.answer('Форма записи команды /left_messages_count:\n/left_messages_count <число>')
+        return
+
+    username, messages_left_count = await MessagesService.get_left_messages_count(int(chat_id))
+
+    await message.answer(
+        f'У пользователя [ <a href=\'https://t.me/{username}\'>{username}</a> ] ' +
+        f'[<a href=\'https://web.telegram.org/k/#{chat_id}\'>{chat_id}</a>] ' +
+        f'осталось <b>{messages_left_count}</b> непрочитанных сообщений',
+        parse_mode=ParseMode.HTML
+    )
 
 
 @settings.dp.callback_query_handler(
