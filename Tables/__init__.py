@@ -18,3 +18,7 @@ from .users_gained_messages import (
     UsersGainedMessages,
     user_gained_messages_table
 )
+from .bot_settings import (
+    BotSettings,
+    bot_settings_table
+)

@@ -7,7 +7,8 @@ from sqlalchemy import (
     BigInteger,
     DateTime,
     text,
-    desc
+    desc,
+    extract
 )
 from sqlalchemy.orm import (
     Session
@@ -39,10 +40,20 @@ class UsersGainedMessages(Base, BaseModel):
         ).all()
 
     @staticmethod
-    def get_last_by_user_id(session: Session, user_id: int) -> list:
+    def get_count_for_today(session: Session, user_id: int) -> int:
         return session.query(UsersGainedMessages).where(
             UsersGainedMessages.user_id == user_id
-        ).order_by(desc(UsersGainedMessages.created_at)).all()
+        ).filter(
+            extract('month', UsersGainedMessages.created_at) == datetime.today().month,
+            extract('year', UsersGainedMessages.created_at) == datetime.today().year,
+            extract('day', UsersGainedMessages.created_at) == datetime.today().day
+        ).count()
+
+    @staticmethod
+    def get_last_by_user_id(session: Session, user_id: int) -> 'UsersGainedMessages':
+        return session.query(UsersGainedMessages).where(
+            UsersGainedMessages.user_id == user_id
+        ).order_by(desc(UsersGainedMessages.created_at)).first()
 
     @staticmethod
     def get_all_in(session: Session, user_id: int, id_list: list) -> list:

@@ -1,7 +1,9 @@
-from random import choice
+import datetime
+from random import choice, randint
 
 from sqlalchemy.orm import Session
 
+from Configs import bot_settings
 from Database import engine
 from Tables import (
     Messages,
@@ -42,13 +44,26 @@ class MessagesService:
             )
 
     @staticmethod
-    async def get_random_message(user_id: int, hours_limit: int, messages_limit: int) -> dict | str | None:
+    async def get_random_message(user_id: int, hours_limit: int, default_messages_limit: int) -> dict | str | None:
         with Session(engine) as session, session.begin():
-            last_except_messages = UsersGainedMessages.get_last_by_user_id(session, user_id)
+            messages_per_day_limit = bot_settings.get('messages_per_day_limit')
+            if not messages_per_day_limit:
+                bot_settings.set('messages_per_day_limit', default_messages_limit)
+            elif messages_per_day_limit['created_at'].date() != datetime.datetime.today().date():
+                bot_settings.update('messages_per_day_limit', randint(1, 4))
+            messages_per_day_limit = bot_settings.get('messages_per_day_limit')
 
-            if len(last_except_messages) >= messages_limit:
-                except_messages_to_count = last_except_messages[messages_limit-1]
-                total_seconds_left = DateService.get_seconds_left(except_messages_to_count.created_at, hours_limit)
+            today_count = UsersGainedMessages.get_count_for_today(session, user_id)
+            last_except_message = UsersGainedMessages.get_last_by_user_id(session, user_id)
+
+            if today_count > messages_per_day_limit['value']:
+                total_seconds_left = DateService.get_seconds_until_end_of_day()
+
+                if total_seconds_left > 0:
+                    return DateService.seconds_to_str(total_seconds_left)
+
+            if today_count <= messages_per_day_limit['value'] and last_except_message:
+                total_seconds_left = DateService.get_seconds_left(last_except_message.created_at, hours_limit)
 
                 if total_seconds_left > 0:
                     return DateService.seconds_to_str(total_seconds_left)

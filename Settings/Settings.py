@@ -14,6 +14,7 @@ class Settings:
 
         self.token = getenv('TEST_BOT_TOKEN') if self.is_testing else getenv('BOT_TOKEN')
         self.admins = getenv('ADMINS').split(',')
+
         logger.info(f'Admins = {self.admins}')
 
         self.resend_to = getenv('RESEND_TO').split(',')

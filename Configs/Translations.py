@@ -1,19 +1,17 @@
 from loguru import logger
 
-from .languages.english import translations as english
 from .languages.russian import translations as russian
 
 
 class Translations:
-    def __init__(self, default_language: str):
-        self.default_language = default_language
+    def __init__(self):
+        self.default_language = 'russian'
         self.all_translations = {
-            'english': english,
             'russian': russian
         }
         self.current_language = None
 
-    def set_translation(self, user_language: str) -> str:
+    def set_translation(self, user_language: str):
         if user_language in self.all_translations.keys():
             self.current_language = user_language
 

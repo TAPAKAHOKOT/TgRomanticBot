@@ -9,7 +9,6 @@ from sqlalchemy import (
     text
 )
 
-from Configs import get_default_language
 from Database import Base
 from Database.metadata import metadata
 from Tables.BaseModel import BaseModel
@@ -22,7 +21,7 @@ class UserSettings(Base, BaseModel):
     id = Column(Integer, autoincrement=True, primary_key=True)
     user_id = Column(ForeignKey('users.id', ondelete="CASCADE"), nullable=True)
 
-    language = Column(String(256), nullable=True, default=get_default_language())
+    language = Column(String(256), nullable=True, default='russian')
 
     updated_at = Column(DateTime, default=datetime.utcnow, server_default=text('now()'))
     created_at = Column(DateTime, default=datetime.utcnow, server_default=text('now()'))
