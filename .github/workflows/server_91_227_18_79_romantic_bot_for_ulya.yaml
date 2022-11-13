@@ -1,4 +1,4 @@
-name: Deploy
+name: Deploy ulya bot
 
 on:
   push:
@@ -14,12 +14,12 @@ jobs:
       uses: appleboy/ssh-action@master
       with:
         host: 91.227.18.79
-        username: tg_romantic_bot
-        key: ${{ secrets.SECRET_KEY }}
+        username: tg_romantic_bot_for_ulya
+        key: ${{ secrets.SECRET_KEY_ULYA }}
         port: 22
         script: |
-          git -C "/home/tg_romantic_bot/TgRomanticBot" pull
-          cd /home/tg_romantic_bot/TgRomanticBot
+          git -C "/home/tg_romantic_bot_for_ulya/TgRomanticBot" pull
+          cd /home/tg_romantic_bot_for_ulya/TgRomanticBot
           docker-compose down
           docker-compose rm -fsv
           docker-compose up -d --build
