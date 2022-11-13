@@ -2,7 +2,7 @@ version: '3.8'
 
 services:
   romantic_bot_db:
-    container_name: romantic_bot_db
+    container_name: ${DOCKER_APP_NAME}_db
     restart: always
     image: postgres:12.0-alpine
     ports:
@@ -15,7 +15,7 @@ services:
       - POSTGRES_DB=${DB_NAME}
     command: -p ${DB_PORT}
   romantic_bot_migration:
-    container_name: romantic_bot_migration
+    container_name: ${DOCKER_APP_NAME}_migration
     links:
       - romantic_bot_db
     depends_on:
@@ -23,7 +23,7 @@ services:
     build: .
     command: alembic upgrade head
   romantic_bot_cache:
-    container_name: romantic_bot_cache
+    container_name: ${DOCKER_APP_NAME}_cache
     depends_on:
       - romantic_bot_migration
     image: redis:latest
@@ -34,7 +34,7 @@ services:
     volumes:
       - cache:/data
   romantic_bot_bot:
-    container_name: romantic_bot_bot
+    container_name: ${DOCKER_APP_NAME}_bot
     restart: always
     depends_on:
       - romantic_bot_cache
@@ -46,4 +46,8 @@ services:
       - ./.env
 volumes:
   postgres_data:
+    external:
+      name: ${DOCKER_VOLUME_POSTGRES_NAME}
   cache:
+    external:
+      name: ${DOCKER_VOLUME_CACHE_NAME}

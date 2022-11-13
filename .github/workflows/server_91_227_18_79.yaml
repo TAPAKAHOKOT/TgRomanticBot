@@ -1,4 +1,4 @@
-name: Deploy ulya bot
+name: Deploy lesha bot
 
 on:
   push:
@@ -6,7 +6,24 @@ on:
       - main
 
 jobs:
-  deploy:
+  deploy_lesha:
+    name: Deploy
+    runs-on: ubuntu-latest
+    steps:
+    - name: Deploying
+      uses: appleboy/ssh-action@master
+      with:
+        host: 91.227.18.79
+        username: tg_romantic_bot
+        key: ${{ secrets.SECRET_KEY }}
+        port: 22
+        script: |
+          git -C "/home/tg_romantic_bot/TgRomanticBot" pull
+          cd /home/tg_romantic_bot/TgRomanticBot
+          docker-compose down
+          docker-compose rm -fsv
+          docker-compose up -d --build
+  deploy_ulya:
     name: Deploy
     runs-on: ubuntu-latest
     steps:
