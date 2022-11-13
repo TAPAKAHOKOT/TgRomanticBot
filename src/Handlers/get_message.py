@@ -13,7 +13,10 @@ async def write_to_dev_message(message: types.Message, user: User):
     random_message = await MessagesService.get_random_message(
         user.id,
         settings.limits['hours'],
-        settings.limits['messages']
+        settings.limits['messages'],
+        settings.timezone,
+        settings.limits['random_from'],
+        settings.limits['random_till']
     )
 
     if random_message is None:

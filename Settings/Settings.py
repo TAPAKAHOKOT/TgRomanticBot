@@ -30,5 +30,8 @@ class Settings:
 
         self.limits = {
             'hours': int(getenv('LIMITS_HOURS')),
-            'messages': int(getenv('LIMITS_MESSAGES'))
+            'messages': int(getenv('LIMITS_MESSAGES')),
+            'random_from': int(getenv('LIMITS_RANDOM_FROM')),
+            'random_till': int(getenv('LIMITS_RANDOM_TILL'))
         }
+        self.timezone = getenv('TIMEZONE')
