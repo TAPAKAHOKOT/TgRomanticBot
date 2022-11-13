@@ -5,7 +5,7 @@ translations = {
                      'Введи /help чтобы получить инструкцию',
             'help': {
                 'admin': 'Форма записи: /help <команда>\nНапример: /help get\n\nСписок доступных команд:\n' +
-                         '/get\n/delete\n/restore\n/get_all_messages\n' +
+                         '/get\n/get_with_trash\n/delete\n/restore\n/get_all_messages\n' +
                          '/get_all_messages_with_trash\n/left_messages_count',
                 'user': 'Просто нажимай на кнопку:):):)',
                 'commands': {
