@@ -46,8 +46,6 @@ services:
       - ./.env
 volumes:
   postgres_data:
-    external:
-      name: ${DOCKER_VOLUME_POSTGRES_NAME}
+    name: ${DOCKER_VOLUME_POSTGRES_NAME}
   cache:
-    external:
-      name: ${DOCKER_VOLUME_CACHE_NAME}
+    name: ${DOCKER_VOLUME_CACHE_NAME}
