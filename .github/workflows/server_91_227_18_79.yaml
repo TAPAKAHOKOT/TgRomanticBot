@@ -35,8 +35,8 @@ jobs:
         key: ${{ secrets.SECRET_KEY_ULYA }}
         port: 22
         script: |
-          git -C "/home/tg_romantic_bot_for_ulya/TgRomanticBot" pull
-          cd /home/tg_romantic_bot_for_ulya/TgRomanticBot
+          git -C "/home/tg_romantic_bot_for_ulya/TgRomanticBotForUlya" pull
+          cd /home/tg_romantic_bot_for_ulya/TgRomanticBotForUlya
           docker-compose down
           docker-compose rm -fsv
           docker-compose up -d --build
