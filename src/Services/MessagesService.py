@@ -133,6 +133,15 @@ class MessagesService:
             }
 
     @staticmethod
+    async def get_message_with_trash(message_id) -> dict:
+        with Session(engine) as session, session.begin():
+            message: Messages = Messages.find_by_id_with_trash(session, message_id)
+            return {
+                'chat_id': message.chat_id,
+                'message_id': message.message_id
+            }
+
+    @staticmethod
     async def is_message_exists(message_id: int):
         with Session(engine) as session, session.begin():
             return bool(Messages.find_by_id(session, message_id))

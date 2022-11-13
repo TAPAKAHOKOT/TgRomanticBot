@@ -87,9 +87,10 @@ async def restore_message(message: types.Message):
         await message.answer('Форма записи команды /restore:\n/restore <число>, <число>, ...\n/restore <число>-<число>')
 
 
-@settings.dp.message_handler(IsRootFilter(), commands=['get'])
+@settings.dp.message_handler(IsRootFilter(), commands=['get', 'get_with_trash'])
 async def get_message(message: types.Message):
-    message_id_str = message.text.replace('/get ', '')
+    with_trash = 'get_with_trash' in message.text
+    message_id_str = message.text.replace('/get_with_trash ' if with_trash else '/get ', '')
 
     is_iterated = False
     if '-' in message_id_str:
@@ -98,7 +99,8 @@ async def get_message(message: types.Message):
             for message_id in range(int(message_id_str_split[0]), int(message_id_str_split[1]) + 1):
                 is_iterated = True
                 try:
-                    message_data = await MessagesService.get_message(int(message_id))
+                    message_data = await MessagesService.get_message_with_trash(int(message_id)) if with_trash else \
+                        await MessagesService.get_message(int(message_id))
                 except Exception:
                     continue
 
@@ -116,7 +118,8 @@ async def get_message(message: types.Message):
         if message_id.isdigit():
             is_iterated = True
             try:
-                message_data = await MessagesService.get_message(int(message_id))
+                message_data = await MessagesService.get_message_with_trash(int(message_id)) if with_trash else \
+                        await MessagesService.get_message(int(message_id))
             except Exception as e:
                 logger.error(e)
                 continue

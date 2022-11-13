@@ -7,6 +7,7 @@ from sqlalchemy import (
     BigInteger,
     DateTime,
     String,
+    and_,
     text
 )
 from sqlalchemy.orm import (
@@ -48,6 +49,12 @@ class Messages(Base, BaseModel):
 
     @staticmethod
     def find_by_id(session: Session, id: int) -> 'Messages':
+        return session.query(Messages).where(
+            and_(Messages.id == id, Messages.status == MessagesStatusEnum.ACTIVE)
+        ).first()
+
+    @staticmethod
+    def find_by_id_with_trash(session: Session, id: int) -> 'Messages':
         return session.query(Messages).where(
             Messages.id == id
         ).first()
