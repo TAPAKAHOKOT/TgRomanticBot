@@ -50,7 +50,7 @@ class MessagesService:
             if not messages_per_day_limit:
                 bot_settings.set('messages_per_day_limit', default_messages_limit)
             elif messages_per_day_limit['created_at'].date() != datetime.datetime.today().date():
-                bot_settings.update('messages_per_day_limit', randint(1, 4))
+                bot_settings.update('messages_per_day_limit', randint(2, 4))
             messages_per_day_limit = bot_settings.get('messages_per_day_limit')
 
             today_count = UsersGainedMessages.get_count_for_today(session, user_id)
