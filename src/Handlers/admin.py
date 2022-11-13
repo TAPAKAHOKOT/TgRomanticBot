@@ -2,6 +2,7 @@ from aiogram import types
 from aiogram.dispatcher import FSMContext, Dispatcher
 from aiogram.types import ParseMode
 from aiogram.utils.exceptions import BadRequest
+from loguru import logger
 
 from Settings import settings
 from Tables import User
@@ -14,7 +15,14 @@ from src.States import AnswerForm
 @settings.dp.message_handler(IsRootFilter(), commands=['get_all_messages'])
 async def get_all_messages(message: types.Message):
     all_messages = await MessagesService.get_all_messages()
-    await message.answer(f'Все сообщения:\n\n--------------------\n{all_messages}\n--------------------')
+    await message.answer(f'Все загруженные сообщения:\n\n--------------------\n{all_messages}\n--------------------')
+
+
+@settings.dp.message_handler(IsRootFilter(), commands=['get_all_messages_with_trash'])
+async def get_all_messages(message: types.Message):
+    all_messages = await MessagesService.get_all_messages_with_trash()
+    await message.answer(
+        f'Все загруженные и удаленные сообщения:\n\n--------------------\n{all_messages}\n--------------------')
 
 
 @settings.dp.message_handler(IsRootFilter(), commands=['delete'])
@@ -31,7 +39,8 @@ async def delete_message(message: types.Message):
                     if await MessagesService.is_message_exists(int(message_id)):
                         await MessagesService.delete_message(int(message_id))
                         await message.answer(f'Сообщение {message_id} удалено')
-                except Exception:
+                except Exception as e:
+                    logger.error(e)
                     continue
 
     for message_id in message_id_str.replace(' ', '').split(','):
@@ -40,10 +49,42 @@ async def delete_message(message: types.Message):
             try:
                 await MessagesService.delete_message(int(message_id))
                 await message.answer(f'Сообщение {message_id} удалено')
-            except Exception:
+            except Exception as e:
+                logger.error(e)
                 continue
     if not is_iterated:
-        await message.answer('Форма записи команды /delete:\n/delete <число>, <число>, ...')
+        await message.answer('Форма записи команды /delete:\n/delete <число>, <число>, ...\n/delete <число>-<число>')
+
+
+@settings.dp.message_handler(IsRootFilter(), commands=['restore'])
+async def restore_message(message: types.Message):
+    message_id_str = message.text.replace('/restore ', '')
+
+    is_iterated = False
+    if '-' in message_id_str:
+        message_id_str_split = message_id_str.replace(' ', '').split('-')
+        if len(message_id_str_split) == 2:
+            for message_id in range(int(message_id_str_split[0]), int(message_id_str_split[1]) + 1):
+                is_iterated = True
+                try:
+                    if await MessagesService.is_message_exists(int(message_id)):
+                        await MessagesService.restore_message(int(message_id))
+                        await message.answer(f'Сообщение {message_id} восстановлено')
+                except Exception as e:
+                    logger.error(e)
+                    continue
+
+    for message_id in message_id_str.replace(' ', '').split(','):
+        if message_id.isdigit():
+            is_iterated = True
+            try:
+                await MessagesService.restore_message(int(message_id))
+                await message.answer(f'Сообщение {message_id} восстановлено')
+            except Exception as e:
+                logger.error(e)
+                continue
+    if not is_iterated:
+        await message.answer('Форма записи команды /restore:\n/restore <число>, <число>, ...\n/restore <число>-<число>')
 
 
 @settings.dp.message_handler(IsRootFilter(), commands=['get'])
@@ -76,7 +117,8 @@ async def get_message(message: types.Message):
             is_iterated = True
             try:
                 message_data = await MessagesService.get_message(int(message_id))
-            except Exception:
+            except Exception as e:
+                logger.error(e)
                 continue
 
             await message.answer(f'Сообщение {message_id}:')
@@ -90,7 +132,7 @@ async def get_message(message: types.Message):
                 await message.answer('удалено')
 
     if not is_iterated:
-        await message.answer('Форма записи команды /get:\n/get <число>, <число>, ...')
+        await message.answer('Форма записи команды /get:\n/get <число>, <число>, ...\n/get <число>-<число>')
 
 
 @settings.dp.message_handler(IsRootFilter(), commands=['left_messages_count'])

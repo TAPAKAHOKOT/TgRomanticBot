@@ -11,6 +11,7 @@ from Tables import (
     User
 )
 from .DateService import DateService
+from src.Enums import MessagesStatusEnum
 
 
 class MessagesService:
@@ -34,10 +35,24 @@ class MessagesService:
         with Session(engine) as session, session.begin():
             all_messages = Messages.get_all(session)
 
-            return '\n--------------------\n\n--------------------\n'.join(
+            return '\n'.join(
                 list(
                     map(
-                        lambda m: f'id: {m.id}\nadded_by: {m.added_by}\nmessage_id: {m.message_id}',
+                        lambda m: f'id: {m.id}',
+                        all_messages
+                    )
+                )
+            )
+
+    @staticmethod
+    async def get_all_messages_with_trash() -> str:
+        with Session(engine) as session, session.begin():
+            all_messages = Messages.get_all_with_trash(session)
+
+            return '\n'.join(
+                list(
+                    map(
+                        lambda m: f'id: {m.id} {"✅" if m.status == MessagesStatusEnum.ACTIVE else "❌"}',
                         all_messages
                     )
                 )
@@ -126,6 +141,11 @@ class MessagesService:
     async def delete_message(message_id: int):
         with Session(engine) as session, session.begin():
             Messages.delete(session, message_id)
+
+    @staticmethod
+    async def restore_message(message_id: int):
+        with Session(engine) as session, session.begin():
+            Messages.restore(session, message_id)
 
     @staticmethod
     async def get_left_messages_count(chat_id: int):

@@ -19,12 +19,21 @@ async def command_start(message: types.Message):
 
 @settings.dp.message_handler(IsRootFilter(), commands=["help"])
 async def command_help(message: types.Message):
-    await message.answer(translations.get('commands.answers.help'))
+    command = message.text.split(' ')
+    if len(command) == 1:
+        await message.answer(translations.get('commands.answers.help.admin'))
+        return
+
+    translation = translations.get('commands.answers.help.commands.' + command[1])
+    if translation is not None:
+        await message.answer(translation)
+        return
+    await message.answer(translations.get('commands.answers.help.command-not-found'))
 
 
 @settings.dp.message_handler(commands=["help"])
 async def command_help(message: types.Message):
-    await message.answer(translations.get('commands.answers.help-all'))
+    await message.answer(translations.get('commands.answers.help.user'))
 
 
 @settings.dp.message_handler(IsRootFilter(), commands=["role"])

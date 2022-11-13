@@ -22,7 +22,7 @@ class Translations:
             return self.all_translations[self.default_language]
         except KeyError:
             logger.error(f'key {self.default_language} not found in Translations.all_translations')
-            raise KeyError
+            return None
 
     def get_recoursive(self, keys: list, translations: dict, default: any = '') -> str:
         if keys[0] in translations.keys():
