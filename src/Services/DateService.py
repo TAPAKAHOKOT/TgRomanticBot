@@ -1,7 +1,5 @@
 import datetime as dt
 
-from pytz import timezone
-
 
 class DateService:
     @staticmethod
@@ -9,9 +7,9 @@ class DateService:
         return int(hours * 3600 - (dt.datetime.today() - datetime_to_count).total_seconds())
 
     @staticmethod
-    def get_seconds_until_end_of_day(tz: str) -> int:
-        now_date = dt.datetime.now(timezone(tz))
-        return int(((24 - now_date.hour - 1) * 60 * 60) + ((60 - now_date.minute - 1) * 60) + (60 - now_date.second))
+    def get_seconds_until_end_of_day() -> int:
+        now_date = dt.datetime.now()
+        return int(((24 - now_date.hour - 1) * 60 * 60) + ((60 - now_date.minute - 1) * 60) + (60 - now_date.second)) - 22 * 3600 - 30 * 60
 
     @staticmethod
     def seconds_to_str(seconds: int) -> str | None:

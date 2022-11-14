@@ -6,7 +6,7 @@ translations = {
             'help': {
                 'admin': 'Форма записи: /help <команда>\nНапример: /help get\n\nСписок доступных команд:\n' +
                          '/get\n/get_with_trash\n/delete\n/restore\n/get_all_messages\n' +
-                         '/get_all_messages_with_trash\n/left_messages_count',
+                         '/get_all_messages_with_trash\n/left_messages_count\n/get_unread_messages',
                 'user': 'Просто нажимай на кнопку:):):)',
                 'commands': {
                     'get': 'Получить содержание выбранных сообщений\n\nФорма записи:\n' +
@@ -32,6 +32,9 @@ translations = {
                     'left_messages_count': 'Получить кол-во непрочитанных сообщений пользователя\n\nФорма записи:\n' +
                                            '/left_messages_count <ID пользователя>\n' +
                                            'Например: /left_messages_count 123456789',
+                    'get_unread_messages': 'Получить непрочитанные сообщения пользователя\n\nФорма записи:\n' +
+                                           '/get_unread_messages <ID пользователя>\n' +
+                                           'Например: /get_unread_messages 123456789',
                 },
                 'command-not-found': 'Такой команды нет, нажми /help чтобы посмотреть список доступных команд'
             },

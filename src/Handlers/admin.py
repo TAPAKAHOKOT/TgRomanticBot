@@ -25,6 +25,26 @@ async def get_all_messages(message: types.Message):
         f'Все загруженные и удаленные сообщения:\n\n--------------------\n{all_messages}\n--------------------')
 
 
+@settings.dp.message_handler(IsRootFilter(), commands=['get_unread_messages'])
+async def get_unread_messages(message: types.Message):
+    chat_id = message.text.replace('/get_unread_messages', '').replace(' ', '')
+
+    if not chat_id.isdigit():
+        await message.answer('Форма записи команды /get_unread_messages:\n/left_messages_count <ID пользователя>')
+        return
+
+    username, messages_left_count, unread_messages = await MessagesService.get_left_messages_count(int(chat_id))
+    horizontal, vertical = await MessagesService.format_id_list(unread_messages)
+
+    await message.answer(
+        f'У пользователя [ <a href=\'https://t.me/{username}\'>{username}</a> ] ' +
+        f'[<a href=\'https://web.telegram.org/k/#{chat_id}\'>{chat_id}</a>] ' +
+        f'осталось <b>{messages_left_count}</b> непрочитанных сообщений:\n{vertical}',
+        parse_mode=ParseMode.HTML
+    )
+    await message.answer(f'/get {horizontal}')
+
+
 @settings.dp.message_handler(IsRootFilter(), commands=['delete'])
 async def delete_message(message: types.Message):
     message_id_str = message.text.replace('/delete ', '')
@@ -119,7 +139,7 @@ async def get_message(message: types.Message):
             is_iterated = True
             try:
                 message_data = await MessagesService.get_message_with_trash(int(message_id)) if with_trash else \
-                        await MessagesService.get_message(int(message_id))
+                    await MessagesService.get_message(int(message_id))
             except Exception as e:
                 logger.error(e)
                 continue
@@ -146,7 +166,7 @@ async def func(message: types.Message):
         await message.answer('Форма записи команды /left_messages_count:\n/left_messages_count <число>')
         return
 
-    username, messages_left_count = await MessagesService.get_left_messages_count(int(chat_id))
+    username, messages_left_count, _ = await MessagesService.get_left_messages_count(int(chat_id))
 
     await message.answer(
         f'У пользователя [ <a href=\'https://t.me/{username}\'>{username}</a> ] ' +

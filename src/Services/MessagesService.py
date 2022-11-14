@@ -10,8 +10,8 @@ from Tables import (
     UsersGainedMessages,
     User
 )
-from .DateService import DateService
 from src.Enums import MessagesStatusEnum
+from .DateService import DateService
 
 
 class MessagesService:
@@ -63,9 +63,8 @@ class MessagesService:
             user_id: int,
             hours_limit: int,
             default_messages_limit: int,
-            timezone: str,
             random_from: int,
-            random_till: int
+            random_till: int,
     ) -> dict | str | None:
         with Session(engine) as session, session.begin():
             messages_per_day_limit = bot_settings.get('messages_per_day_limit')
@@ -79,7 +78,7 @@ class MessagesService:
             last_except_message = UsersGainedMessages.get_last_by_user_id(session, user_id)
 
             if today_count > messages_per_day_limit['value']:
-                total_seconds_left = DateService.get_seconds_until_end_of_day(timezone)
+                total_seconds_left = DateService.get_seconds_until_end_of_day()
 
                 if total_seconds_left > 0:
                     return DateService.seconds_to_str(total_seconds_left)
@@ -163,4 +162,22 @@ class MessagesService:
             all_messages = list(map(lambda m: m.id, Messages.get_all(session)))
             gained_messages = UsersGainedMessages.get_all_in(session, user.id, all_messages)
 
-            return user.username, len(all_messages) - len(gained_messages)
+            unread_messages = await MessagesService.get_unread_messages(
+                all_messages,
+                list(map(lambda m: m.id, gained_messages))
+            )
+
+            return user.username, len(all_messages) - len(gained_messages), unread_messages
+
+    @staticmethod
+    async def get_unread_messages(all_messages: list, gained_messages: list) -> list:
+        messages = []
+        for message_id in all_messages:
+            if message_id not in gained_messages:
+                messages.append(message_id)
+        return messages
+
+    @staticmethod
+    async def format_id_list(id_list: list) -> tuple:
+        id_list = list(map(str, id_list))
+        return ', '.join(id_list), '\n'.join(id_list)

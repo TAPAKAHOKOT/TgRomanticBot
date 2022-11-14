@@ -15,7 +15,6 @@ async def write_to_dev_message(message: types.Message, user: User):
         user.id,
         settings.limits['hours'],
         settings.limits['messages'],
-        settings.timezone,
         settings.limits['random_from'],
         settings.limits['random_till']
     )
@@ -28,7 +27,7 @@ async def write_to_dev_message(message: types.Message, user: User):
         await message.answer(f'Прости, солнышко\nНа сегодня у меня закончились мысли 🥺💔\nМеня осенит через {random_message}')
         return
 
-    await settings.bot.copy_message(
+    new_message = await settings.bot.copy_message(
         from_chat_id=random_message['chat_id'],
         chat_id=message.chat.id,
         message_id=random_message['message_id']
@@ -48,9 +47,11 @@ async def write_to_dev_message(message: types.Message, user: User):
                     message_id=random_message['message_id'],
                     reply_markup=AnswerCallback.get_answer_inline(
                         user.username,
-                        random_message['chat_id'],
-                        random_message['message_id']
+                        message.chat.id,
+                        new_message.message_id
                     )
                 )
     except Exception as e:
-        pass
+        import loguru
+        loguru.logger.debug(new_message)
+        loguru.logger.debug(e)
