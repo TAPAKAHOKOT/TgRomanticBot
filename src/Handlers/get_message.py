@@ -52,6 +52,4 @@ async def write_to_dev_message(message: types.Message, user: User):
                     )
                 )
     except Exception as e:
-        import loguru
-        loguru.logger.debug(new_message)
-        loguru.logger.debug(e)
+        pass

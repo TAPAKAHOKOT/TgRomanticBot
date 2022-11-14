@@ -9,7 +9,7 @@ class DateService:
     @staticmethod
     def get_seconds_until_end_of_day() -> int:
         now_date = dt.datetime.now()
-        return int(((24 - now_date.hour - 1) * 60 * 60) + ((60 - now_date.minute - 1) * 60) + (60 - now_date.second)) - 22 * 3600 - 30 * 60
+        return int(((24 - now_date.hour - 1) * 60 * 60) + ((60 - now_date.minute - 1) * 60) + (60 - now_date.second))
 
     @staticmethod
     def seconds_to_str(seconds: int) -> str | None:
