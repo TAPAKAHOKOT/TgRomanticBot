@@ -6,6 +6,7 @@ from Configs import translations
 from Settings import settings
 from Tables import User
 from src.Services import MessagesService
+from src.Callbacks import AnswerCallback
 
 
 @settings.dp.message_handler(Text(equals=translations.get_in_all_languages('keyboards.buttons.get-message')))
@@ -44,7 +45,12 @@ async def write_to_dev_message(message: types.Message, user: User):
                 await settings.bot.copy_message(
                     from_chat_id=random_message['chat_id'],
                     chat_id=chat_id,
-                    message_id=random_message['message_id']
+                    message_id=random_message['message_id'],
+                    reply_markup=AnswerCallback.get_answer_inline(
+                        user.username,
+                        random_message['chat_id'],
+                        random_message['message_id']
+                    )
                 )
     except Exception as e:
         pass
