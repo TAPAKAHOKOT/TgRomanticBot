@@ -60,7 +60,7 @@ class UsersGainedMessages(Base, BaseModel):
         return session.query(UsersGainedMessages).where(
             UsersGainedMessages.user_id == user_id
         ).filter(
-            UsersGainedMessages.id.in_(id_list)
+            UsersGainedMessages.message_id.in_(id_list)
         ).all()
 
 
