@@ -49,9 +49,18 @@ class Translations:
         values = []
         keys = key.split('.')
         for translations in self.all_translations.values():
+            custom_translation = self.get_recoursive(
+                key.split('.'),
+                settings.custom_translations
+            )
+            if custom_translation:
+                values.append(custom_translation)
+                continue
+
             value = self.get_recoursive(
                 keys,
                 translations
             )
-            if value: values.append(value)
+            if value:
+                values.append(value)
         return values
