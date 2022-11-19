@@ -1,3 +1,4 @@
+import json
 from os import getenv
 
 from aiogram import Bot, Dispatcher
@@ -9,6 +10,20 @@ logger.info('Loaded dotenv')
 
 class Settings:
     def __init__(self):
+        self.admins = None
+        self.token = None
+        self.is_testing = None
+        self.resend_to = None
+        self.bot = None
+        self.dp = None
+        self.limits = None
+        self.timezone = None
+        self.custom_translations = None
+
+        self.load_env()
+        self.load_custom_translations()
+
+    def load_env(self):
         self.is_testing = getenv('TESTING_MODE') == 'TRUE'
         logger.info(f'Is testing = {self.is_testing}')
 
@@ -35,3 +50,7 @@ class Settings:
             'random_till': int(getenv('LIMITS_RANDOM_TILL'))
         }
         self.timezone = getenv('TIMEZONE')
+
+    def load_custom_translations(self):
+        with open('custom_translations.json') as file:
+            self.custom_translations = json.load(file)

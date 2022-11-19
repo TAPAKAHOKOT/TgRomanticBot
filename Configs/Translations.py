@@ -1,5 +1,6 @@
 from loguru import logger
 
+from Settings import settings
 from .languages.russian import translations as russian
 
 
@@ -32,6 +33,13 @@ class Translations:
         return default
 
     def get(self, key: str, default: any = ''):
+        custom_translation = self.get_recoursive(
+            key.split('.'),
+            settings.custom_translations
+        )
+        if custom_translation:
+            return custom_translation
+
         return self.get_recoursive(
             key.split('.'),
             self.get_translation()

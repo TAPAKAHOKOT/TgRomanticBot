@@ -12,6 +12,18 @@ from src.Services import MessagesService
 from src.States import AnswerForm
 
 
+@settings.dp.message_handler(IsRootFilter(), commands=['load_env'])
+async def get_all_messages(message: types.Message):
+    settings.load_env()
+    await message.answer('Настройки обновлены')
+
+
+@settings.dp.message_handler(IsRootFilter(), commands=['load_custom_translations'])
+async def get_all_messages(message: types.Message):
+    settings.load_custom_translations()
+    await message.answer('Переводы обновлены')
+
+
 @settings.dp.message_handler(IsRootFilter(), commands=['get_all_messages'])
 async def get_all_messages(message: types.Message):
     all_messages = await MessagesService.get_all_messages()

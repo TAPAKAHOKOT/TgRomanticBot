@@ -13,5 +13,5 @@ engine = create_engine(
         DB_HOST=getenv("DB_HOST"),
         DB_PORT=getenv("DB_PORT"),
         DB_NAME=getenv("DB_NAME")
-    ), echo=True
+    )
 )

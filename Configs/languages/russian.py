@@ -5,8 +5,8 @@ translations = {
                      'Введи /help чтобы получить инструкцию',
             'help': {
                 'admin': 'Форма записи: /help <команда>\nНапример: /help get\n\nСписок доступных команд:\n' +
-                         '/get\n/get_with_trash\n/delete\n/restore\n/get_all_messages\n' +
-                         '/get_all_messages_with_trash\n/left_messages_count\n/get_unread_messages',
+                         '/get\n/get_with_trash\n/delete\n/restore\n/get_all_messages\n/get_all_messages_with_trash\n' +
+                         '/left_messages_count\n/get_unread_messages\n/load_env\n/load_custom_translations',
                 'user': 'Просто нажимай на кнопку:):):)',
                 'commands': {
                     'get': 'Получить содержание выбранных сообщений\n\nФорма записи:\n' +
@@ -46,7 +46,8 @@ translations = {
         }
     },
     'answers': {
-        'dont-understand': "Извини, я не понимаю, нажми /start или /help"
+        'dont-understand': "Извини, я не понимаю, нажми /start или /help",
+        'try-later': "Прости, солнышко\nНа сегодня у меня закончились мысли 🥺💔\nМеня осенит через {random_message}"
     },
     'keyboards': {
         'answers': {
