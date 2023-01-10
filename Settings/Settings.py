@@ -18,10 +18,17 @@ class Settings:
         self.dp = None
         self.limits = None
         self.timezone = None
+        self.enabled_users = None
         self.custom_translations = None
 
         self.load_env()
         self.load_custom_translations()
+
+        logger.info(self)
+
+    def __str__(self):
+        attrs = vars(self)
+        return '\n' + '\n'.join("\t[ %s => %s ]" % item for item in attrs.items())
 
     def load_env(self):
         self.is_testing = getenv('TESTING_MODE') == 'TRUE'
@@ -50,6 +57,10 @@ class Settings:
             'random_till': int(getenv('LIMITS_RANDOM_TILL'))
         }
         self.timezone = getenv('TIMEZONE')
+
+        enabled_users = getenv('ENABLED_USERS')
+        if enabled_users:
+            self.enabled_users = enabled_users.split(',')
 
     def load_custom_translations(self):
         with open('custom_translations.json') as file:

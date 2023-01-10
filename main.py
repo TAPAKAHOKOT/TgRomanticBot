@@ -6,7 +6,8 @@ from src.Middlewares import (
     LoggingMiddleware,
     UserMiddleware,
     SetupRoleMiddleware,
-    TranslationMiddleware
+    TranslationMiddleware,
+    AvailableUsersMiddleware
 )
 
 
@@ -23,6 +24,7 @@ def setup_middlewares():
     settings.dp.middleware.setup(UserMiddleware())
     settings.dp.middleware.setup(SetupRoleMiddleware())
     settings.dp.middleware.setup(TranslationMiddleware())
+    settings.dp.middleware.setup(AvailableUsersMiddleware())
 
 
 # def bind_filters():
