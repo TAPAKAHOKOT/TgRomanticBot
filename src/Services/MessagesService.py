@@ -8,7 +8,8 @@ from Database import engine
 from Tables import (
     Messages,
     UsersGainedMessages,
-    User
+    User,
+    UsersBotMessages
 )
 from src.Enums import MessagesStatusEnum
 from .DateService import DateService
@@ -185,3 +186,23 @@ class MessagesService:
     async def format_id_list(id_list: list) -> tuple:
         id_list = list(map(str, id_list))
         return ', '.join(id_list), '\n'.join(id_list)
+
+    @staticmethod
+    async def save_sent_message(user_id: int, user_message_id: int, bot_message_id: int) -> int:
+        with Session(engine) as session, session.begin():
+            message = UsersBotMessages(
+                user_id=user_id,
+                user_message_id=user_message_id,
+                bot_message_id=bot_message_id
+            )
+
+            session.add(message)
+            session.flush()
+
+    @staticmethod
+    async def get_user_message_by_bot_message(bot_message_id: int) -> int:
+        with Session(engine, expire_on_commit=False) as session, session.begin():
+            msg = UsersBotMessages.find_by_bot_message_id(session, bot_message_id)
+            user = User.find_by_id(session, msg.user_id)
+
+            return msg, user

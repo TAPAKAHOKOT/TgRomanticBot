@@ -22,3 +22,7 @@ from .bot_settings import (
     BotSettings,
     bot_settings_table
 )
+from .users_bot_messages import (
+    UsersBotMessages,
+    users_bot_messages_table
+)

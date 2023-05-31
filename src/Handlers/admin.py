@@ -242,9 +242,18 @@ async def write_to_dev_message(call: types.CallbackQuery, state: FSMContext):
     content_types=['any']
 )
 async def save_any_message(message: types.Message, user: User):
-    saved_message_id = await MessagesService.add_message(
-        user.id,
-        message.from_user.id,
-        message.message_id
-    )
-    await message.answer(f'Id сообщения: {saved_message_id}', reply=True)
+    if message.reply_to_message is None:
+        saved_message_id = await MessagesService.add_message(
+            user.id,
+            message.from_user.id,
+            message.message_id
+        )
+        await message.answer(f'Id сообщения: {saved_message_id}', reply=True)
+    else:
+        msg, user = await MessagesService.get_user_message_by_bot_message(message.reply_to_message.message_id)
+        await settings.bot.copy_message(
+            from_chat_id=message.chat.id,
+            chat_id=user.chat_id,
+            message_id=message.message_id,
+            reply_to_message_id=msg.user_message_id
+        )

@@ -7,6 +7,7 @@ from Settings import settings
 from Tables import User
 from src.Services import MessagesService
 from src.Callbacks import AnswerCallback
+from loguru import logger
 
 
 @settings.dp.message_handler(Text(equals=translations.get_in_all_languages('keyboards.buttons.get-message')))
@@ -42,18 +43,16 @@ async def write_to_dev_message(message: types.Message, user: User):
             for chat_id in settings.resend_to:
                 await settings.bot.send_message(
                     chat_id=chat_id,
-                    text=f'Пользователь [ <a href=\'https://t.me/{user.username}\'>{user.username}</a> ] [<a href=\'https://web.telegram.org/k/#{message.chat.id}\'>{message.chat.id}</a>] получил сообщение',
-                    parse_mode=ParseMode.HTML
+                    text=f'<a href=\'https://t.me/{user.username}\'>{user.username}</a> получил сообщение:',
+                    parse_mode=ParseMode.HTML,
+                    disable_web_page_preview=True
                 )
-                await settings.bot.copy_message(
+                msg = await settings.bot.copy_message(
                     from_chat_id=random_message['chat_id'],
                     chat_id=chat_id,
-                    message_id=random_message['message_id'],
-                    reply_markup=AnswerCallback.get_answer_inline(
-                        user.username,
-                        message.chat.id,
-                        new_message.message_id
-                    )
+                    message_id=random_message['message_id']
                 )
+
+                await MessagesService.save_sent_message(user.id, new_message.message_id, msg.message_id)
     except Exception as e:
-        pass
+        logger.error(e)

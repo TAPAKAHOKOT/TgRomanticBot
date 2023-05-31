@@ -1,4 +1,5 @@
 import json
+import os
 from os import getenv
 
 from aiogram import Bot, Dispatcher
@@ -63,5 +64,9 @@ class Settings:
             self.enabled_users = enabled_users.split(',')
 
     def load_custom_translations(self):
-        with open('custom_translations.json') as file:
+        if not os.path.exists('custom_translations.json'):
+            with open('custom_translations.json', 'w') as file:
+                json.dump({}, file)
+
+        with open('custom_translations.json', 'r') as file:
             self.custom_translations = json.load(file)

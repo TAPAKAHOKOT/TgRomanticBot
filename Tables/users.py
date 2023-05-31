@@ -51,6 +51,12 @@ class User(Base, BaseModel):
         return User
 
     @staticmethod
+    def find_by_id(session: Session, user_id: int) -> 'User':
+        return session.query(User).where(
+            User.id == user_id
+        ).first()
+
+    @staticmethod
     def find_by_chat_id(session: Session, chat_id: int) -> 'User':
         return session.query(User).where(
             User.chat_id == chat_id
