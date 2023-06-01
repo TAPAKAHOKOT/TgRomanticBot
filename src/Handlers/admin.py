@@ -42,8 +42,11 @@ async def get_unread_messages(message: types.Message):
     chat_id = message.text.replace('/get_unread_messages', '').replace(' ', '')
 
     if not chat_id.isdigit():
-        await message.answer('Форма записи команды /get_unread_messages:\n/left_messages_count <ID пользователя>')
-        return
+        if not settings.enabled_users or len(settings.enabled_users) > 1:
+            await message.answer('Форма записи команды /get_unread_messages:\n/left_messages_count <ID пользователя>')
+            return
+        else:
+            chat_id = settings.enabled_users[0]
 
     username, messages_left_count, unread_messages = await MessagesService.get_left_messages_count(int(chat_id))
     horizontal, vertical = await MessagesService.format_id_list(unread_messages)
@@ -52,7 +55,8 @@ async def get_unread_messages(message: types.Message):
         f'У пользователя [ <a href=\'https://t.me/{username}\'>{username}</a> ] ' +
         f'[<a href=\'https://web.telegram.org/k/#{chat_id}\'>{chat_id}</a>] ' +
         f'осталось <b>{messages_left_count}</b> непрочитанных сообщений:\n{vertical}',
-        parse_mode=ParseMode.HTML
+        parse_mode=ParseMode.HTML,
+        disable_web_page_preview=True
     )
     await message.answer(f'/get {horizontal}')
 
@@ -175,8 +179,11 @@ async def func(message: types.Message):
     chat_id = message.text.replace('/left_messages_count', '').replace(' ', '')
 
     if not chat_id.isdigit():
-        await message.answer('Форма записи команды /left_messages_count:\n/left_messages_count <число>')
-        return
+        if not settings.enabled_users or len(settings.enabled_users) > 1:
+            await message.answer('Форма записи команды /left_messages_count:\n/left_messages_count <число>')
+            return
+        else:
+            chat_id = settings.enabled_users[0]
 
     username, messages_left_count, _ = await MessagesService.get_left_messages_count(int(chat_id))
 
@@ -184,7 +191,8 @@ async def func(message: types.Message):
         f'У пользователя [ <a href=\'https://t.me/{username}\'>{username}</a> ] ' +
         f'[<a href=\'https://web.telegram.org/k/#{chat_id}\'>{chat_id}</a>] ' +
         f'осталось <b>{messages_left_count}</b> непрочитанных сообщений',
-        parse_mode=ParseMode.HTML
+        parse_mode=ParseMode.HTML,
+        disable_web_page_preview=True
     )
 
 
